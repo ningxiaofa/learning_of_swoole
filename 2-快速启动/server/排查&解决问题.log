@@ -1,0 +1,197 @@
+主要是学习Swoole的过程中遇到的问题和解决方式
+
+文档：
+https://blog.csdn.net/william_n/article/details/127522690
+
+「这里的端口统一使用9501做例子」
+
+1. 确认端口是否被占用
+Mac/Linux: 查看端口是否正在监听
+netstat -an | grep 9501
+
+2. 无法连接到服务器的简单检测手段
+在 Linux 下，使用 netstat -an | grep 端口，查看端口是否已经被打开处于 Listening 状态
+上一步确认后，再检查防火墙问题。
+注意服务器所使用的 IP 地址，如果是 127.0.0.1 回环地址，则客户端只能使用 127.0.0.1 才能连接上
+用的阿里云服务或者腾讯服务，需要在安全权限组进行设置开发的端口
+
+3. 确认是端口占用，查看以及kill占用端口的主进程
+查看监听指定端口的进程：
+lsof -nP | grep LISTEN | grep 9501
+结果如下：
+➜  ~ lsof -nP | grep LISTEN | grep 9501
+php       23702 huangbaoyin    5u     IPv4 0xc1779d015d613719         0t0                 TCP 127.0.0.1:9501 (LISTEN)
+php       23703 huangbaoyin    5u     IPv4 0xc1779d015d613719         0t0                 TCP 127.0.0.1:9501 (LISTEN)
+php       23708 huangbaoyin    5u     IPv4 0xc1779d015d613719         0t0                 TCP 127.0.0.1:9501 (LISTEN)
+php       23709 huangbaoyin    5u     IPv4 0xc1779d015d613719         0t0                 TCP 127.0.0.1:9501 (LISTEN)
+php       23711 huangbaoyin    5u     IPv4 0xc1779d015d613719         0t0                 TCP 127.0.0.1:9501 (LISTEN)
+php       23712 huangbaoyin    5u     IPv4 0xc1779d015d613719         0t0                 TCP 127.0.0.1:9501 (LISTEN)
+php       23713 huangbaoyin    5u     IPv4 0xc1779d015d613719         0t0                 TCP 127.0.0.1:9501 (LISTEN)
+php       23714 huangbaoyin    5u     IPv4 0xc1779d015d613719         0t0                 TCP 127.0.0.1:9501 (LISTEN)
+php       23715 huangbaoyin    5u     IPv4 0xc1779d015d613719         0t0                 TCP 127.0.0.1:9501 (LISTEN)
+php       25403 huangbaoyin    5u     IPv4 0xc1779d015d613719         0t0                 TCP 127.0.0.1:9501 (LISTEN)
+php       25407 huangbaoyin    5u     IPv4 0xc1779d015d613719         0t0                 TCP 127.0.0.1:9501 (LISTEN)
+php       25409 huangbaoyin    5u     IPv4 0xc1779d015d613719         0t0                 TCP 127.0.0.1:9501 (LISTEN)
+php       25417 huangbaoyin    5u     IPv4 0xc1779d015d613719         0t0                 TCP 127.0.0.1:9501 (LISTEN)
+php       25430 huangbaoyin    5u     IPv4 0xc1779d015d613719         0t0                 TCP 127.0.0.1:9501 (LISTEN)
+➜  ~ 
+
+查看所有TCP连接监听状态的进程：
+lsof -nP -iTCP -sTCP:LISTEN
+执行和结果
+➜  ~ lsof -nP -iTCP -sTCP:LISTEN
+COMMAND     PID        USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME
+rapportd    432 huangbaoyin    3u  IPv4 0xc1779d01653496e1      0t0  TCP *:64811 (LISTEN)
+rapportd    432 huangbaoyin    4u  IPv6 0xc1779d0af653b2d1      0t0  TCP *:64811 (LISTEN)
+ControlCe   454 huangbaoyin   18u  IPv4 0xc1779d015cf256e1      0t0  TCP *:7000 (LISTEN)
+ControlCe   454 huangbaoyin   19u  IPv6 0xc1779d0af653c7d1      0t0  TCP *:7000 (LISTEN)
+ControlCe   454 huangbaoyin   20u  IPv4 0xc1779d015cf221e9      0t0  TCP *:5000 (LISTEN)
+ControlCe   454 huangbaoyin   21u  IPv6 0xc1779d0af653ced1      0t0  TCP *:5000 (LISTEN)
+com.docke  1707 huangbaoyin   29u  IPv4 0xc1779d015cf0f719      0t0  TCP *:51727 (LISTEN)
+com.docke  1707 huangbaoyin   41u  IPv4 0xc1779d015cf22c81      0t0  TCP *:60086 (LISTEN)
+com.docke  1707 huangbaoyin  151u  IPv4 0xc1779d015f64ec81      0t0  TCP 127.0.0.1:33060 (LISTEN)
+com.docke  1707 huangbaoyin  152u  IPv4 0xc1779d015d5fac81      0t0  TCP 127.0.0.1:63790 (LISTEN)
+com.docke  1707 huangbaoyin  235u  IPv4 0xc1779d015f7c21e9      0t0  TCP 127.0.0.1:4430 (LISTEN)
+com.docke  1707 huangbaoyin  237u  IPv4 0xc1779d01631e3719      0t0  TCP 127.0.0.1:8080 (LISTEN)
+vpnkit-br 16738 huangbaoyin    8u  IPv4 0xc1779d015cf22c81      0t0  TCP *:60086 (LISTEN)
+php       23702 huangbaoyin    5u  IPv4 0xc1779d015d613719      0t0  TCP 127.0.0.1:9501 (LISTEN)
+php       23703 huangbaoyin    5u  IPv4 0xc1779d015d613719      0t0  TCP 127.0.0.1:9501 (LISTEN)
+php       23708 huangbaoyin    5u  IPv4 0xc1779d015d613719      0t0  TCP 127.0.0.1:9501 (LISTEN)
+php       23709 huangbaoyin    5u  IPv4 0xc1779d015d613719      0t0  TCP 127.0.0.1:9501 (LISTEN)
+php       23711 huangbaoyin    5u  IPv4 0xc1779d015d613719      0t0  TCP 127.0.0.1:9501 (LISTEN)
+php       23712 huangbaoyin    5u  IPv4 0xc1779d015d613719      0t0  TCP 127.0.0.1:9501 (LISTEN)
+php       23713 huangbaoyin    5u  IPv4 0xc1779d015d613719      0t0  TCP 127.0.0.1:9501 (LISTEN)
+php       23714 huangbaoyin    5u  IPv4 0xc1779d015d613719      0t0  TCP 127.0.0.1:9501 (LISTEN)
+php       23715 huangbaoyin    5u  IPv4 0xc1779d015d613719      0t0  TCP 127.0.0.1:9501 (LISTEN)
+php       25403 huangbaoyin    5u  IPv4 0xc1779d015d613719      0t0  TCP 127.0.0.1:9501 (LISTEN)
+php       25407 huangbaoyin    5u  IPv4 0xc1779d015d613719      0t0  TCP 127.0.0.1:9501 (LISTEN)
+php       25409 huangbaoyin    5u  IPv4 0xc1779d015d613719      0t0  TCP 127.0.0.1:9501 (LISTEN)
+php       25417 huangbaoyin    5u  IPv4 0xc1779d015d613719      0t0  TCP 127.0.0.1:9501 (LISTEN)
+php       25430 huangbaoyin    5u  IPv4 0xc1779d015d613719      0t0  TCP 127.0.0.1:9501 (LISTEN)
+?\x81?  55673 huangbaoyin  233u  IPv4 0xc1779d0161b6b719      0t0  TCP 127.0.0.1:50010 (LISTEN)
+?\x81?  55673 huangbaoyin  334u  IPv4 0xc1779d01600da1e9      0t0  TCP 192.168.2.10:5786 (LISTEN)
+ClashX    90474 huangbaoyin    7u  IPv4 0xc1779d015ea2e1e9      0t0  TCP 127.0.0.1:7890 (LISTEN)
+ClashX    90474 huangbaoyin    8u  IPv4 0xc1779d015e927719      0t0  TCP 127.0.0.1:9090 (LISTEN)
+➜  ~ 
+
+Mac: 查看执行的进程「特别是启动Swoole脚本的进程」
+ps -ef | grep 2-快速启动/server/tcp_server_with_async_task.php 
+
+执行和输出：
+➜  learning_of_swoole git:(main) ✗ ps -ef | grep 2-快速启动/server/tcp_server_with_async_task.php
+  501 23702     1   0  4:44下午 ??         0:00.11 php 2-快速启动/server/tcp_server_with_async_task.php
+  501 23703 23702   0  4:44下午 ??         0:00.02 php 2-快速启动/server/tcp_server_with_async_task.php
+  501 23708 23703   0  4:44下午 ??         0:00.00 php 2-快速启动/server/tcp_server_with_async_task.php
+  501 23709 23703   0  4:44下午 ??         0:00.00 php 2-快速启动/server/tcp_server_with_async_task.php
+  501 23711 23703   0  4:44下午 ??         0:00.00 php 2-快速启动/server/tcp_server_with_async_task.php
+  501 23712 23703   0  4:44下午 ??         0:00.00 php 2-快速启动/server/tcp_server_with_async_task.php
+  501 23713 23703   0  4:44下午 ??         0:00.00 php 2-快速启动/server/tcp_server_with_async_task.php
+  501 23714 23703   0  4:44下午 ??         0:00.00 php 2-快速启动/server/tcp_server_with_async_task.php
+  501 23715 23703   0  4:44下午 ??         0:00.00 php 2-快速启动/server/tcp_server_with_async_task.php
+  501 25403 23703   0  4:55下午 ??         0:00.00 php 2-快速启动/server/tcp_server_with_async_task.php
+  501 25407 23703   0  4:55下午 ??         0:00.00 php 2-快速启动/server/tcp_server_with_async_task.php
+  501 25409 23703   0  4:55下午 ??         0:00.00 php 2-快速启动/server/tcp_server_with_async_task.php
+  501 25417 23703   0  4:55下午 ??         0:00.00 php 2-快速启动/server/tcp_server_with_async_task.php
+  501 25430 23703   0  4:56下午 ??         0:00.00 php 2-快速启动/server/tcp_server_with_async_task.php
+  501 26811 25496   0  5:06下午 ttys001    0:00.00 grep --color=auto --exclude-dir=.bzr --exclude-dir=CVS --exclude-dir=.git --exclude-dir=.hg --exclude-dir=.svn --exclude-dir=.idea --exclude-dir=.tox 2-快速启动/server/tcp_server_with_async_task.php
+➜  learning_of_swoole git:(main) ✗ 
+
+从上面的结果可分析得到：
+进程树「进程模型」
+
+可以使用pstree工具分析作证
+➜  learning_of_swoole git:(main) ✗ pstree -p 23702 // 23702 即swoole的主「祖宗」进程
+-+= 00001 root /sbin/launchd
+ \-+= 23702 huangbaoyin php 2-快速启动/server/tcp_server_with_async_task.php
+   \-+- 23703 huangbaoyin php 2-快速启动/server/tcp_server_with_async_task.php
+     |--- 23708 huangbaoyin php 2-快速启动/server/tcp_server_with_async_task.php
+     |--- 23709 huangbaoyin php 2-快速启动/server/tcp_server_with_async_task.php
+     |--- 23711 huangbaoyin php 2-快速启动/server/tcp_server_with_async_task.php
+     |--- 23712 huangbaoyin php 2-快速启动/server/tcp_server_with_async_task.php
+     |--- 23713 huangbaoyin php 2-快速启动/server/tcp_server_with_async_task.php
+     |--- 23714 huangbaoyin php 2-快速启动/server/tcp_server_with_async_task.php
+     |--- 23715 huangbaoyin php 2-快速启动/server/tcp_server_with_async_task.php
+     |--- 25403 huangbaoyin php 2-快速启动/server/tcp_server_with_async_task.php
+     |--- 25407 huangbaoyin php 2-快速启动/server/tcp_server_with_async_task.php
+     |--- 25409 huangbaoyin php 2-快速启动/server/tcp_server_with_async_task.php
+     |--- 25417 huangbaoyin php 2-快速启动/server/tcp_server_with_async_task.php
+     \--- 25430 huangbaoyin php 2-快速启动/server/tcp_server_with_async_task.php
+➜  learning_of_swoole git:(main) ✗ 
+Swoole进程模型：
+-+= 00001 // 操作系统真正的祖宗进程
+ \-+= 23702 // Swoole的主进程，祖宗进程
+   \-+- 23703 // Manager进程，父进程为23702，下面的进程都是它的子进程，可以看到12个，8{worker进程}+4{task进程}
+     |--- 23708 
+     |--- 23709 
+     |--- 23711 
+     |--- 23712 
+     |--- 23713 
+     |--- 23714 
+     |--- 23715 
+     |--- 25403 
+     |--- 25407 
+     |--- 25409 
+     |--- 25417 
+     \--- 25430 
+
+
+Mac上可能没安装，需要自己安装下
+➜  ~ brew info pstree   // 查看下信息
+==> pstree: stable 2.39 (bottled)
+Show ps output as a tree
+http://www.thp.uni-duisburg.de/pstree/
+Not installed
+From: https://github.com/Homebrew/homebrew-core/blob/HEAD/Formula/pstree.rb
+==> Analytics
+install: 15,678 (30 days), 35,771 (90 days), 67,813 (365 days)
+install-on-request: 15,665 (30 days), 35,755 (90 days), 67,790 (365 days)
+build-error: 0 (30 days)
+➜  ~ export https_proxy=http://127.0.0.1:7890 http_proxy=http://127.0.0.1:7890 all_proxy=socks5://127.0.0.1:7890
+➜  ~ 
+
+使用
+brew install pstree安装
+或者
+下载源码，进行编译安装
+https://mirrors.ustc.edu.cn/homebrew-bottles/pstree-2.39.arm64_monterey.bottle.2.tar.gz
+or
+https://ghcr.io/v2/homebrew/core/pstree/manifests/2.39-2
+
+这里使用brew进行安装
+➜  ~ brew install pstree
+Running `brew update --auto-update`...
+==> Auto-updated Homebrew!
+Updated 1 tap (shivammathur/php).
+
+==> Downloading https://mirrors.ustc.edu.cn/homebrew-bottles/pstree-2.39.arm64_monterey.bottle.2.tar.gz
+curl: (22) The requested URL returned error: 404                              
+
+Warning: Bottle missing, falling back to the default domain...
+==> Downloading https://ghcr.io/v2/homebrew/core/pstree/manifests/2.39-2
+######################################################################## 100.0%
+==> Downloading https://ghcr.io/v2/homebrew/core/pstree/blobs/sha256:9733dc8a9d384a122e5fad0b21a33142bef94cf85e2a0cb02e66753fd316a133
+==> Downloading from https://pkg-containers.githubusercontent.com/ghcr1/blobs/sha256:9733dc8a9d384a122e5fad0b21a33142bef94cf85e2a0cb02e66753fd316a133?se=2022-10-29T09%3A25%3A00Z&sig=RSyyUp6gk%2B51Z6QhRd
+######################################################################## 100.0%
+==> Pouring pstree--2.39.arm64_monterey.bottle.2.tar.gz
+🍺  /opt/homebrew/Cellar/pstree/2.39: 5 files, 57.5KB
+==> Running `brew cleanup pstree`...
+Disable this behaviour by setting HOMEBREW_NO_INSTALL_CLEANUP.
+Hide these hints with HOMEBREW_NO_ENV_HINTS (see `man brew`).
+➜  ~
+
+4. 杀死进程
+通常使用kill即可
+
+这里杀死Swoole主进程，但是遇到了问题，manager和worker/task进程依然存在
+➜  learning_of_swoole git:(main) ✗ kill -9 23702
+➜  learning_of_swoole git:(main) ✗ pstree -p 23702
+➜  learning_of_swoole git:(main) ✗ 
+
+解决办法：
+方式一：使用killall // 好处，不论是否已kill master进程
+killall -9 php 2-快速启动/server/tcp_server_with_async_task.php // 所有「php 2-快速启动/server/tcp_server_with_async_task.php」进程名的进程
+
+方式二： 如果还没有kill master进程「或者说只要这些进程的父进程不是PID=1的进程就可以」
+kill -15 父进程
+
+方式三: 一个一个kill
