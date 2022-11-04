@@ -9,7 +9,8 @@
     // Warning: stream_socket_accept(): accept failed: Connection timed out
     // Warning: stream_socket_client(): unable to connect to tcp://127.0.0.1:9502 (Connection refused) 
 // ]
-// 原因:TBD
+// 原因: 应该是这种方式TCP Server同一时间只能接受一个客户端请求
+// 更多：TBD
 
 $s = microtime(true);
 
@@ -116,6 +117,7 @@ function tcp_server()
         }
     }
 }
+// 在CLI下，将同时请求数量改为1[$c=1, $n=1]，则不会出现报错
 function tcp_client()
 {
     for ($c = 128; $c--;) {

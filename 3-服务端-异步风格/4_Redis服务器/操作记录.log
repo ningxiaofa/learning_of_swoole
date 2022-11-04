@@ -1,0 +1,36 @@
+$ redis-cli -h 127.0.0.1 -p 9501
+127.0.0.1:9501> set name swoole
+OK
+127.0.0.1:9501> get name
+"swoole"
+127.0.0.1:9501> sadd swooler rango
+(integer) 1
+127.0.0.1:9501> sadd swooler twosee guoxinhua
+(integer) 2
+127.0.0.1:9501> smembers swooler
+1) "rango"
+2) "twosee"
+3) "guoxinhua"
+127.0.0.1:9501> hset website swoole "www.swoole.com"
+(integer) 1
+127.0.0.1:9501> hset website swoole "swoole.com"
+(integer) 0
+127.0.0.1:9501> hgetall website
+1) "swoole"
+2) "swoole.com"
+127.0.0.1:9501> test
+(error) ERR unknown command 'test'
+127.0.0.1:9501>
+
+
+-------------- 操作步骤
+Start redis server of swoole:
+php 3-服务端-异步风格/4_Redis服务器/redis_server.php
+
+Env:
+redis download：
+https://redis.io/download/#redis-downloads
+https://packages.redis.io/redis-stack/redis-stack-server-6.2.4-v3.catalina.x86_64.zip[Mac下解压即可直接使用]
+
+Redis exec path:
+/Users/huangbaoyin/Documents/Env/service/redis-stack-server-6.2.4-v3.catalina.x86_64/bin

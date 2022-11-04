@@ -1,0 +1,38 @@
+启动服务器：
+php 3-服务端-异步风格/TCP-and-UDP服务器/addProcess.php
+
+客户端连接：
+telnet localhost 9501
+
+➜  ~ ps -ef | grep addProcess.php
+  501 35276 22226   0  5:55下午 ttys005    0:00.08 php 3-服务端-异步风格/TCP-and-UDP服务器/addProcess.php
+  501 35281 35276   0  5:55下午 ttys005    0:00.00 php 3-服务端-异步风格/TCP-and-UDP服务器/addProcess.php
+  501 35282 35281   0  5:55下午 ttys005    0:00.00 php 3-服务端-异步风格/TCP-and-UDP服务器/addProcess.php
+  501 35283 35281   0  5:55下午 ttys005    0:00.00 php 3-服务端-异步风格/TCP-and-UDP服务器/addProcess.php
+  501 35284 35281   0  5:55下午 ttys005    0:00.00 php 3-服务端-异步风格/TCP-and-UDP服务器/addProcess.php
+  501 35285 35281   0  5:55下午 ttys005    0:00.00 php 3-服务端-异步风格/TCP-and-UDP服务器/addProcess.php
+  501 35286 35281   0  5:55下午 ttys005    0:00.00 php 3-服务端-异步风格/TCP-and-UDP服务器/addProcess.php
+  501 35287 35281   0  5:55下午 ttys005    0:00.00 php 3-服务端-异步风格/TCP-and-UDP服务器/addProcess.php
+  501 35288 35281   0  5:55下午 ttys005    0:00.00 php 3-服务端-异步风格/TCP-and-UDP服务器/addProcess.php
+  501 35289 35281   0  5:55下午 ttys005    0:00.00 php 3-服务端-异步风格/TCP-and-UDP服务器/addProcess.php
+  501 35290 35281   0  5:55下午 ttys005    0:00.00 php 3-服务端-异步风格/TCP-and-UDP服务器/addProcess.php
+  501 35396 65767   0  5:56下午 ttys008    0:00.00 grep --color=auto --exclude-dir=.bzr --exclude-dir=CVS --exclude-dir=.git --exclude-dir=.hg --exclude-dir=.svn --exclude-dir=.idea --exclude-dir=.tox addProcess.php
+➜  ~ pstree -p 35276
+-+= 00001 root /sbin/launchd
+ \-+= 65229 huangbaoyin /Applications/Visual Studio Code.app/Contents/MacOS/Electron
+   \-+- 65280 huangbaoyin /Applications/Visual Studio Code.app/Contents/Frameworks/Code Helper (Renderer).app/Contents/MacOS/Code Helper (Renderer) --type=renderer --user-data-dir=/Users/huangbaoyin/Li
+     \-+- 65285 huangbaoyin /Applications/Visual Studio Code.app/Contents/Frameworks/Code Helper (Renderer).app/Contents/MacOS/Code Helper (Renderer) --ms-enable-electron-run-as-node /Applications/Visu
+       \-+= 22226 huangbaoyin /bin/zsh -il
+         \-+= 35276 huangbaoyin php 3-服务端-异步风格/TCP-and-UDP服务器/addProcess.php
+           \-+- 35281 huangbaoyin php 3-服务端-异步风格/TCP-and-UDP服务器/addProcess.php
+             |--- 35282 huangbaoyin php 3-服务端-异步风格/TCP-and-UDP服务器/addProcess.php
+             |--- 35283 huangbaoyin php 3-服务端-异步风格/TCP-and-UDP服务器/addProcess.php
+             |--- 35284 huangbaoyin php 3-服务端-异步风格/TCP-and-UDP服务器/addProcess.php
+             |--- 35285 huangbaoyin php 3-服务端-异步风格/TCP-and-UDP服务器/addProcess.php
+             |--- 35286 huangbaoyin php 3-服务端-异步风格/TCP-and-UDP服务器/addProcess.php
+             |--- 35287 huangbaoyin php 3-服务端-异步风格/TCP-and-UDP服务器/addProcess.php
+             |--- 35288 huangbaoyin php 3-服务端-异步风格/TCP-and-UDP服务器/addProcess.php
+             |--- 35289 huangbaoyin php 3-服务端-异步风格/TCP-and-UDP服务器/addProcess.php
+             \--- 35290 huangbaoyin php 3-服务端-异步风格/TCP-and-UDP服务器/addProcess.php
+➜  ~     
+
