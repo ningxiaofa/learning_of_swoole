@@ -1,0 +1,39 @@
+1.测试ws server
+Start up ws server:
+php 4-服务端-协程风格/ws_server.php
+
+Client to access:
+浏览器访问:
+http://127.0.0.1:9502/
+
+浏览器console输出:
+Connected to WebSocket server.
+Retrieved data from server: Hello hello!
+Retrieved data from server: How are you, hello?
+Disconnected
+
+服务端输出:
+➜  learning_of_swoole git:(main) ✗ 
+php 4-服务端-协程风格/ws_server.php 
+errorCode: 60
+
+2. 测试ws server 群发
+修改4-服务端-协程风格/ws_server.php中url
+// 测试ws server
+// var wsServer = 'ws://127.0.0.1:9502/websocket';
+// 测试ws server群发
+var wsServer = 'ws://127.0.0.1:9503/websocket';
+
+然后分别启动
+php 4-服务端-协程风格/ws_server.php
+php 4-服务端-协程风格/ws_server_群发.php
+
+客户端访问:
+http://127.0.0.1:9502/
+可以看到后续的网络请求了ws://127.0.0.1:9503/websocket
+服务端返回了响应。
+
+浏览器console输出
+Connected to WebSocket server.
+Retrieved data from server: Server：hello
+Disconnected // [这个超时断开连接，客户端中执行 close事件函数，console.log("Disconnected");]
