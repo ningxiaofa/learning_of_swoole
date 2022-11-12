@@ -1,0 +1,11 @@
+➜  learning_of_swoole git:(main) ✗ php 6-协程高级/9_连接池/mysqli_pool.php
+Use 0.18065881729126s for 1024 queries
+➜  learning_of_swoole git:(main) ✗ php 6-协程高级/9_连接池/pdo_pool.php
+Use 0.082974910736084s for 1024 queries
+➜  learning_of_swoole git:(main) ✗ php 6-协程高级/9_连接池/redis_pool.php
+Use 0.034574031829834s for 2048 queries
+➜  learning_of_swoole git:(main) ✗ 
+
+疑问：
+time php 6-协程高级/9_连接池/mysqli_pool.php
+输出的结果的时间上对不上 ? TBD
