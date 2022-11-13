@@ -1,0 +1,128 @@
+1. 测试 server.php
+    ➜  learning_of_swoole git:(main) ✗ php 9-进程间同步/1_进程间无锁计数器-Atomic/server.php
+    ManagerStart
+    start
+    shutdown
+    ➜  learning_of_swoole git:(main) ✗ php 9-进程间同步/1_进程间无锁计数器-Atomic/server.php
+    ManagerStart
+    start
+    shutdown
+    ➜  learning_of_swoole git:(main) ✗ php 9-进程间同步/1_进程间无锁计数器-Atomic/server.php
+    ManagerStart
+    start
+    shutdown
+    ➜  learning_of_swoole git:(main) ✗ 
+
+
+2. 测试 wait.php
+    ➜  learning_of_swoole git:(main) ✗ php 9-进程间同步/1_进程间无锁计数器-Atomic/wait.php  
+    master start
+    master wait: before: 0
+    child start
+    child wakeup: before: 4294967295
+    child wakeup: after: 0
+    child end
+    master wait: after: 0
+    master end
+    ➜  learning_of_swoole git:(main) ✗ php 9-进程间同步/1_进程间无锁计数器-Atomic/wait.php
+    master start
+    master wait: before: 0
+    child start
+    child wakeup: before: 4294967295
+    child wakeup: after: 0
+    child end
+    master wait: after: 0
+    master end
+    ➜  learning_of_swoole git:(main) ✗ 
+
+3. 测试 wait-1.php
+    ➜  learning_of_swoole git:(main) ✗ php 9-进程间同步/1_进程间无锁计数器-Atomic/wait-1.php
+    master start
+    master wait: before: 1
+    master wait: after: 0
+    master end
+    child start
+    ➜  learning_of_swoole git:(main) ✗ child wakeup: before: 0
+    child wakeup: after: 1
+    child end
+            // 终端进程处于阻塞状态...
+
+    但是有可能真正的执行流程如下：TBD
+    ➜  learning_of_swoole git:(main) ✗ php 9-进程间同步/1_进程间无锁计数器-Atomic/wait-1.php
+    master start
+    master wait: before: 1
+    master wait: after: 0
+    master end
+    child start
+    
+    child wakeup: before: 0
+    child wakeup: after: 1
+    child end
+    ➜  learning_of_swoole git:(main) ✗ // 即 ➜  learning_of_swoole git:(main)的输出比 {child wakeup: before: 0
+    child wakeup: after: 1
+    child end} 快了，很可能是因为sleep的原因.
+   
+    注释sleep函数, 输出结果如下:
+    ➜  learning_of_swoole git:(main) ✗ php 9-进程间同步/1_进程间无锁计数器-Atomic/wait-1.php
+    master start
+    master wait: before: 1
+    master wait: after: 0
+    master end
+    child start
+    child wakeup: before: 0
+    child wakeup: after: 1
+    child end
+    ➜  learning_of_swoole git:(main) ✗ php 9-进程间同步/1_进程间无锁计数器-Atomic/wait-1.php
+    master start
+    master wait: before: 1
+    master wait: after: 0
+    master end
+    child start
+    child wakeup: before: 0
+    child wakeup: after: 1
+    child end
+    ➜  learning_of_swoole git:(main) ✗ 
+
+
+4. 测试 wait-2.php
+    ➜  learning_of_swoole git:(main) ✗ php 9-进程间同步/1_进程间无锁计数器-Atomic/wait-2.php
+    master start
+    master wait: before: 1
+    master wait: after: 0
+    master end
+    common start-1
+    common wakeup-1: before: 0
+    child start
+    child wakeup: before: 4294967295
+    child wakeup: after: 0
+    child end
+    common start-1
+    common wakeup-1: before: 0
+    common wakeup-1: after: 0
+    common wakeup-1 end
+    common wakeup-1: after: 0
+    common wakeup-1 end
+    ➜  learning_of_swoole git:(main) ✗ php 9-进程间同步/1_进程间无锁计数器-Atomic/wait-2.php
+    master start
+    master wait: before: 1
+    master wait: after: 0
+    master end
+    common start-1
+    common wakeup-1: before: 0
+    child start
+    child wakeup: before: 4294967295
+    child wakeup: after: 0
+    child end
+    common start-1
+    common wakeup-1: before: 0
+    common wakeup-1: after: 0
+    common wakeup-1 end
+    common wakeup-1: after: 0
+    common wakeup-1 end
+    ➜  learning_of_swoole git:(main) ✗ 
+
+
+文档上的内容：
+当前原子计数如果为 0 时，表示没有进程正在 wait，wakeup 会立即返回 true；
+当前原子计数如果为 1 时，表示当前有进程正在 wait，wakeup 会唤醒等待的进程，并返回 true；
+被唤醒的进程返回后，会将原子计数设置为 0，这时可以再次调用 wakeup 唤醒其他正在 wait 的进程。
