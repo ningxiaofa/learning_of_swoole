@@ -1,0 +1,90 @@
+1. 启动服务器
+➜  learning_of_swoole git:(main) ✗ php 8-进程间共享内存/1_高性能共享内存-Table/server.php
+
+2. tcp 客户端去发起请求：
+    client 1: telnet localhost 9501
+    
+    ➜  learning_of_swoole git:(main) ✗ telnet
+    localhost 9501
+    Trying ::1...
+    telnet: connect to address ::1: Connection refused
+    Trying 127.0.0.1...
+    Connected to localhost.
+    Escape character is '^]'.
+    get 
+    false
+    set 1      
+    OK
+    set 2
+    OK
+    set 3
+    OK
+    get 
+    array (
+    'fd' => 1,
+    'reactor_id' => 0,
+    'data' => '3', // 可以看到上面执行命令，最后将data设置为了3
+    )
+    get 2
+    false
+    get 0
+    false
+    get 1
+    array (
+    'fd' => 1,
+    'reactor_id' => 0,
+    'data' => '3',
+    ) // 因为这时候只有一个client 1，所以，获取其他client
+    // 下面是client 2 连接到服务器，同时发送了set 23
+    get 2  
+    array (
+    'fd' => 2,
+    'reactor_id' => 0,
+    'data' => '23',
+    )
+   
+    client 2: telnet localhost 9501
+    ➜  learning_of_swoole git:(main) ✗ telnet
+    localhost 9501
+    Trying ::1...
+    telnet: connect to address ::1: Connection refused
+    Trying 127.0.0.1...
+    Connected to localhost.
+    Escape character is '^]'.
+    get
+    false
+    get 1
+    array (
+    'fd' => 1,
+    'reactor_id' => 0,
+    'data' => '3',
+    )
+    set 23
+    OK
+    get  
+    array (
+    'fd' => 2,
+    'reactor_id' => 0,
+    'data' => '23',
+    )
+    get 1
+    array (
+    'fd' => 1,
+    'reactor_id' => 0,
+    'data' => '3',
+    )
+    set iamwilliam
+    OK
+    get
+    array (
+    'fd' => 2,
+    'reactor_id' => 0,
+    'data' => 'iamwilliam',
+    )
+    get 2
+    array (
+    'fd' => 2,
+    'reactor_id' => 0,
+    'data' => 'iamwilliam',
+    )
+    // 看下代码和执行的命令即可知道
