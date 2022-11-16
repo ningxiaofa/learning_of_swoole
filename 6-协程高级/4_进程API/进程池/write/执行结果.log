@@ -1,0 +1,9 @@
+
+✗ php 6-协程 高级/4_进程API/进程池/write/server.php
+Message: {"data":"hello","uid":1991}
+
+
+➜  learning_of_swoole git:(main) ✗ php 6-协程高级/4_进程API/进程池/write/client.php
+string(13) "hello world 
+"
+➜  learning_of_swoole git:(main) ✗ 
